@@ -13,6 +13,20 @@ public class Player : MonoBehaviour
     private Dialogue dialogue;
 
     private Animator animator;
+
+    public bool item = false;
+
+    private IEnumerator Blink()
+    {
+        while (true)
+        {
+            animator.SetBool("Blink", false);
+            yield return new WaitForSeconds(10f);
+            animator.SetBool("Blink", true);
+            yield return new WaitForSeconds(0.5f);
+        }
+    }
+
     private void ability()
     {
         animator.SetFloat("Speed", 0);
@@ -36,6 +50,7 @@ public class Player : MonoBehaviour
         animator = GetComponent<Animator>();
         dialogue = GetComponent<Dialogue>();
         audioSource = GetComponent<AudioSource>();
+        StartCoroutine(Blink());
     }
 
     void Update()
@@ -54,7 +69,7 @@ public class Player : MonoBehaviour
                 audioSource.clip = step;
                 audioSource.Play();
             }
-
+            
             animator.SetFloat("Speed", (Vector2.Distance(Vector2.zero, direction) > 0 ? 1 : 0));
             if (direction.x < 0) GetComponent<SpriteRenderer>().flipX = true;
             else if (direction.x > 0) GetComponent<SpriteRenderer>().flipX = false;
