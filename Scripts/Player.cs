@@ -19,6 +19,15 @@ public class Player : MonoBehaviour
         active = false;
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        TriggerZoneText trigger = collision.GetComponent<TriggerZoneText>();
+        if (trigger)
+        {
+            dialogue.say(trigger.text);
+        }
+    }
+
     private void Start()
     {
         animator = GetComponent<Animator>();

@@ -8,18 +8,36 @@ public class Dialogue : MonoBehaviour
 {
     [SerializeField, Range(0f, 1f)] private float delay;
     [SerializeField] private Text attachedText;
-    
-    private IEnumerator print(string str)
+
+    private bool skiping = false;
+    public bool printing = false;
+    private IEnumerator print(string[] text)
     {
-        foreach (char c in str)
+        printing = true;
+        foreach (string str in text)
         {
-            attachedText.text += c;
-            yield return new WaitForSeconds(delay);
+            skiping = false;
+            attachedText.text = "";
+            foreach (char c in str)
+            {
+                attachedText.text += c;
+                if (skiping) break;
+                yield return new WaitForSeconds(delay);
+            }
+            attachedText.text = str;
+            skiping = false;
+            while (!skiping) yield return new WaitForEndOfFrame();
         }
+        printing = false;
     }
 
-    public void say(string text)
+    public void say(string[] text)
     {
-        StartCoroutine(print(text));
+        if (!printing) StartCoroutine(print(text));
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && printing) skiping = true;
     }
 }
