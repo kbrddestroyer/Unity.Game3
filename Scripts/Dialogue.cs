@@ -8,7 +8,10 @@ public class Dialogue : MonoBehaviour
 {
     [SerializeField, Range(0f, 1f)] private float delay;
     [SerializeField] private Text attachedText;
+    
+    [SerializeField] private AudioClip beep;
 
+    private AudioSource audioSource;
     private bool skiping = false;
     public bool printing = false;
     private IEnumerator print(string[] text)
@@ -22,6 +25,8 @@ public class Dialogue : MonoBehaviour
             {
                 attachedText.text += c;
                 if (skiping) break;
+                audioSource.clip = beep;
+                audioSource.Play();
                 yield return new WaitForSeconds(delay);
             }
             attachedText.text = str;
@@ -34,6 +39,11 @@ public class Dialogue : MonoBehaviour
     public void say(string[] text)
     {
         if (!printing) StartCoroutine(print(text));
+    }
+
+    private void Start()
+    {
+        audioSource = GetComponent<AudioSource>();
     }
 
     private void Update()

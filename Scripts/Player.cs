@@ -6,6 +6,8 @@ public class Player : MonoBehaviour
 {
     [SerializeField, Range(0f, 10f)] private float speed;
     [SerializeField] public GameObject ghostPrefab;
+    [SerializeField] private AudioClip step;
+    private AudioSource audioSource;
     public bool active = true;
     private Dialogue dialogue;
 
@@ -32,6 +34,7 @@ public class Player : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         dialogue = GetComponent<Dialogue>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -44,6 +47,13 @@ public class Player : MonoBehaviour
             }
             Vector2 direction = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
             transform.Translate(direction * Time.deltaTime * speed);
+
+            if (direction != Vector2.zero && !audioSource.isPlaying)
+            {
+                audioSource.clip = step;
+                audioSource.Play();
+            }
+
             animator.SetFloat("Speed", Vector2.Distance(Vector2.zero, direction));
             if (direction.x < 0) GetComponent<SpriteRenderer>().flipX = true;
             else if (direction.x > 0) GetComponent<SpriteRenderer>().flipX = false;
