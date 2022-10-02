@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     [SerializeField, Range(0f, 10f)] private float speed;
     [SerializeField] public GameObject ghostPrefab;
     [SerializeField] private AudioClip step;
+    [SerializeField] private Transform ghostPosition;
     private AudioSource audioSource;
     public bool active = true;
     private Dialogue dialogue;
@@ -15,7 +16,7 @@ public class Player : MonoBehaviour
     private void ability()
     {
         animator.SetFloat("Speed", 0);
-        GameObject ghost = Instantiate(ghostPrefab, transform.position, Quaternion.identity);
+        GameObject ghost = Instantiate(ghostPrefab, ghostPosition.position, Quaternion.identity);
         Camera.main.GetComponent<CameraController>().player = ghost.transform;
         ghost.GetComponent<Ghost>().parent = this.gameObject;
         active = false;
@@ -54,7 +55,7 @@ public class Player : MonoBehaviour
                 audioSource.Play();
             }
 
-            animator.SetFloat("Speed", Vector2.Distance(Vector2.zero, direction));
+            animator.SetFloat("Speed", (Vector2.Distance(Vector2.zero, direction) > 0 ? 1 : 0));
             if (direction.x < 0) GetComponent<SpriteRenderer>().flipX = true;
             else if (direction.x > 0) GetComponent<SpriteRenderer>().flipX = false;
         }
