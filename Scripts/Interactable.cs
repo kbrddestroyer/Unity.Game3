@@ -4,18 +4,32 @@ using UnityEngine;
 
 public class Interactable : MonoBehaviour
 {
-    public void interact()
+    [SerializeField, Range(1f, 10f)] private float interactDistance;
+    private Player player;
+    private IEnumerator Pickup()
     {
-        GameObject.FindGameObjectWithTag("Player").GetComponent<Player>().item = true;
+        player.GetComponent<Animator>().SetBool("pickup", true);
+        yield return new WaitForSeconds(0.4f);
+        player.GetComponent<Animator>().SetBool("pickup", false);
         Destroy(this.gameObject);
     }
 
-    // Update is called once per frame
+    private void Start()
+    {
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+    }
+
+    public void interact()
+    {
+        GameObject.FindGameObjectWithTag("Player").GetComponent<Player>().item = true;
+    }
+
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E) && Vector2.Distance(transform.position, player.transform.position) <= interactDistance)
         {
             interact();
+            StartCoroutine(Pickup());
         }
     }
 }

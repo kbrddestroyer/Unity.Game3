@@ -10,12 +10,12 @@ public class Player : MonoBehaviour
     [SerializeField] private Transform ghostPosition;
     private AudioSource audioSource;
     public bool active = true;
+    public bool alive = false;
     private Dialogue dialogue;
 
     private Animator animator;
 
     public bool item = false;
-
     private IEnumerator Blink()
     {
         while (true)
@@ -29,11 +29,16 @@ public class Player : MonoBehaviour
 
     private void ability()
     {
-        animator.SetFloat("Speed", 0);
         GameObject ghost = Instantiate(ghostPrefab, ghostPosition.position, Quaternion.identity);
         Camera.main.GetComponent<CameraController>().player = ghost.transform;
         ghost.GetComponent<Ghost>().parent = this.gameObject;
         active = false;
+        Capsule capsule = GameObject.Find("capsule").GetComponent<Capsule>();
+        if (capsule)
+        {
+            capsule.ghost = ghost.GetComponent<Ghost>();
+        }
+        animator.SetFloat("Speed", 0);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -61,18 +66,21 @@ public class Player : MonoBehaviour
             {
                 ability();
             }
-            Vector2 direction = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-            transform.Translate(direction * Time.deltaTime * speed);
-
-            if (direction != Vector2.zero && !audioSource.isPlaying)
+            if (alive)
             {
-                audioSource.clip = step;
-                audioSource.Play();
+                Vector2 direction = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+                transform.Translate(direction * Time.deltaTime * speed);
+
+                if (direction != Vector2.zero && !audioSource.isPlaying)
+                {
+                    audioSource.clip = step;
+                    audioSource.Play();
+                }
+
+                animator.SetFloat("Speed", (Vector2.Distance(Vector2.zero, direction) > 0 ? 1 : 0));
+                if (direction.x < 0) GetComponent<SpriteRenderer>().flipX = true;
+                else if (direction.x > 0) GetComponent<SpriteRenderer>().flipX = false;
             }
-            
-            animator.SetFloat("Speed", (Vector2.Distance(Vector2.zero, direction) > 0 ? 1 : 0));
-            if (direction.x < 0) GetComponent<SpriteRenderer>().flipX = true;
-            else if (direction.x > 0) GetComponent<SpriteRenderer>().flipX = false;
         }
     }
 }
